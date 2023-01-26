@@ -1,10 +1,12 @@
-const { Schema, model } = require('mongoose');
+const { Schema, Types } = require('mongoose');
 
 const reactionSchema = new Schema(
     {
         reactionID: {
-            // use mongoose's objectid data type
-            // default value is set to a new objectid
+            // mongoose's objectid data type
+            type: Schema.Types.ObjectId,
+            // if there is not reactionID, a new objectid will be set
+            default: () => new Types.ObjectId()
         },
         reactionBody: {
             type: String,
@@ -18,12 +20,13 @@ const reactionSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            // use a getter method to format the timestamp on query
+            // a getter method to format the timestamp on query
+            get: (timestamp) => dateFormat(timestamp)
         }
-        // this will not be a model but rather will be used as the reaction field's subdocument schema in the thought model
+
     }
 )
 
-const Reaction = model('reaction', reactionSchema);
+// this is not a model, it is used as the reaction field's subdocument schema in the thought model
 
-module.exports = Reaction;
+module.exports = reactionSchema;

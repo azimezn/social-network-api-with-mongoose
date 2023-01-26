@@ -19,12 +19,12 @@ const userSchema = new Schema(
         // array of _id values referencing thought model
         thoughts: [{
             type: Schema.Types.ObjectId,
-            ref: 'Thought',
+            ref: 'thought',
         }],
         // array of _id values referencing User model (self-reference)
         friends: [{
             type: Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'user'
         }]
     },
     {

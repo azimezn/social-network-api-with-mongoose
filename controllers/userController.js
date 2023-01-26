@@ -11,25 +11,38 @@ module.exports = {
             .catch((err) => res.status(500).json(err));
     },
     getSingleUser(req, res) {
-        // get one user by its _id and populated thought and friend data ??????
+        // get one user by its _id
+        console.log(req.params.userId);
         User.findOne({ _id: req.params.userId })
             // ?????????? this means exclude _v from the returned document?
             .select('-_v')
+            // populated thought and friend data ??????
+            .populate('thoughts', 'friends')
             .then((user) =>
                 !user
                     ? res.status(404).json({ message: 'No user exists with this ID' })
                     : res.json(user)
             )
-            .catch((err) => res.status(500).json(err));
+            .catch((err) => {
+                console.log(err);
+                return res.status(500).json(err)
+            });
+
     },
     createUser(req, res) {
-        // post a new user ????????????
+        // create a new user
         User.create(req.body)
             .then((dbUserData) => res.json(dbUserData))
             .catch((err) => res.status(500).json(err));
     },
     updateUser(req, res) {
         // put to update user by its _id ????????
+        // $addToSet or $set
+        User.findOneAndUpdate(
+            { _id: req.params.userId},
+            { $addToSet: req.body},
+            { runValidators: true, new: true }
+        )
     },
     deleteUser(req, res) {
         // delete to remove user by its _id ??????????

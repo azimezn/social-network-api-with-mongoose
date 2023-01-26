@@ -3,12 +3,14 @@ const { application } = require('express');
 const express = require('express');
 // imports connection to the database and holds it with a variable
 const db = require('./config/connection');
+const routes = require('./routes')
 
 const PORT = process.env.PORT || 3001;
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(routes);
 
 // listens for the open event, which happens when the database is connected successfully
 db.once('open', () => {
