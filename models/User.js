@@ -13,14 +13,19 @@ const userSchema = new Schema(
             type: String,
             required: true,
             unique: true,
-            //match: /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/, ???
+            // matches a regex for email
+            match: /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/,
         },
-        thoughts: {
-            //array of _id values referencing thought model
-        },
-        friends: {
-            //array of _id values referencing User model(self-reference)
-        }
+        // array of _id values referencing thought model
+        thoughts: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Thought',
+        }],
+        // array of _id values referencing User model (self-reference)
+        friends: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }]
     },
     {
         // allows virtuals to be included when documents are converted to JSON
@@ -32,7 +37,7 @@ const userSchema = new Schema(
 );
 
 // creates a virtual called friendCount that retrieves the length of the user's friends array field on query
-postSchema.virtual('friendCount').get(function () {
+userSchema.virtual('friendCount').get(function () {
     return this.friends.length;
 });
 
