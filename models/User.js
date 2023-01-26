@@ -21,10 +21,22 @@ const userSchema = new Schema(
         friends: {
             //array of _id values referencing User model(self-reference)
         }
-        // create a virtual called friendCount that retrieves the length of the user's friends array field on query
+    },
+    {
+        // allows virtuals to be included when documents are converted to JSON
+        // virtuals are not saved in the database
+        toJSON: {
+            virtuals: true,
+        }
     }
-)
+);
 
+// creates a virtual called friendCount that retrieves the length of the user's friends array field on query
+postSchema.virtual('friendCount').get(function () {
+    return this.friends.length;
+});
+
+// creates a mongoose model
 const User = model('user', userSchema);
 
 module.exports = User;
