@@ -32,7 +32,8 @@ const userSchema = new Schema(
         // virtuals are not saved in the database
         toJSON: {
             virtuals: true,
-        }
+        },
+        id: false,
     }
 );
 

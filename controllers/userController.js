@@ -13,7 +13,7 @@ module.exports = {
     getSingleUser(req, res) {
         // get one user by its _id and populated thought and friend data ??????
         User.findOne({ _id: req.params.userId })
-            // ??????????
+            // ?????????? this means exclude _v from the returned document?
             .select('-_v')
             .then((user) =>
                 !user
@@ -25,8 +25,8 @@ module.exports = {
     createUser(req, res) {
         // post a new user ????????????
         User.create(req.body)
-        .then((dbUserData) => res.json(dbUserData))
-        .catch((err) => res.status(500).json(err));
+            .then((dbUserData) => res.json(dbUserData))
+            .catch((err) => res.status(500).json(err));
     },
     updateUser(req, res) {
         // put to update user by its _id ????????
