@@ -29,7 +29,6 @@ module.exports = {
     },
     createUser(req, res) {
         // create a new user
-        console.log("--- req.body", req.body)
         User.create(req.body)
             .then((dbUserData) => res.json(dbUserData))
             .catch((err) => res.status(500).json(err));
@@ -77,7 +76,7 @@ module.exports = {
         User.findOneAndUpdate(
             { _id: req.params.userId },
             { $addToSet: { friends: req.params.friendId } },
-            { runValidators: true, new: true }
+            { new: true }
         )
             .then((user) =>
                 !user

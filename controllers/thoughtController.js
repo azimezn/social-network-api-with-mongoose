@@ -1,4 +1,4 @@
-const { Thought } = require('../models');
+const { Thought, User } = require('../models');
 
 module.exports = {
 
@@ -19,11 +19,20 @@ module.exports = {
             )
             .catch((err) => res.status(500).json(err));
     },
-    // push the created thought's _id to the associated user's thoughts array field ?????????
     createThought(req, res) {
         // create a new thought
         Thought.create(req.body)
-            .then((dbThoughtData) => res.json(dbThoughtData))
+            // push the created thought's _id to the associated user's thoughts array field
+            .then((thought) => User.findOneAndUpdate(
+                { username: req.body.username },
+                { $addToSet: { thoughts: thought._id } },
+                { new: true }
+            ))
+            .then((user) =>
+                !user
+                    ? res.status(404).json({ message: 'No user exists with this username!' })
+                    : res.json(user)
+            )
             .catch((err) => res.status(500).json(err));
     },
     updateThought(req, res) {
@@ -43,10 +52,15 @@ module.exports = {
     deleteThought(req, res) {
         // remove thought by its _id
         Thought.findOneAndRemove({ _id: req.params.thoughtId })
-            .then((thought) =>
-                !thought
-                    ? res.status(404).json({ message: 'No user exists with this ID!' })
-                    : res.json({ message: 'Thought successfully deleted' })
+            .then((thought) => User.findOneAndUpdate(
+                { username: thought.username },
+                { $pull: { thoughts: thought._id } },
+                { new: true }
+            ))
+            .then((user) =>
+                !user
+                    ? res.status(404).json({ message: 'No user exists with this username!' })
+                    : res.json(user)
             )
             .catch((err) => {
                 console.log(err);
@@ -71,7 +85,7 @@ module.exports = {
         // delete to pull and remove a reaction by the reaction's reactionId value ????? added a route not on the readme...     
         Thought.findOneAndUpdate(
             { _id: req.params.thoughtId },
-            { $pull: { reactions: {reactionID: req.params.reactionId } } },
+            { $pull: { reactions: { reactionID: req.params.reactionId } } },
             { runValidators: true, new: true }
         )
             .then((thought) =>
