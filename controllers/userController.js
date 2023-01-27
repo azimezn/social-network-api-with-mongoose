@@ -90,7 +90,6 @@ module.exports = {
         // remove a friend from a user's friend list ?????????????
         User.findOneAndUpdate(
             { _id: req.params.userId },
-            // $in ????????????
             { $pull: { friends: req.params.friendId } },
             { runValidators: true, new: true }
         )
