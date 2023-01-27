@@ -58,7 +58,7 @@ module.exports = {
                 { new: true }
             ))
             .then((user) =>
-                !user
+                user
                     ? res.status(404).json({ message: 'No user exists with this username!' })
                     : res.json(user)
             )

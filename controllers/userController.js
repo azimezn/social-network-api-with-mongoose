@@ -57,13 +57,10 @@ module.exports = {
                         { users: req.params.userId },
                         { $pull: { students: req.params.userId } },
                         { new: true }
-                    )
-            )
+                    ))
             .then((thought) =>
-                !thought
-                    ? res.status(404).json({
-                        message: 'User deleted, but no thoughts found',
-                    })
+                thought
+                    ? res.status(404).json({ message: 'User deleted, but no thoughts found' })
                     : res.json({ message: 'User and its thoughts successfully deleted' })
             )
             .catch((err) => {
