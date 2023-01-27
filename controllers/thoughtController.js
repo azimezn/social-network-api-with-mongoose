@@ -71,8 +71,7 @@ module.exports = {
         // delete to pull and remove a reaction by the reaction's reactionId value ????? added a route not on the readme...     
         Thought.findOneAndUpdate(
             { _id: req.params.thoughtId },
-            { $pull: { reactions: { reactionId: { $in: [req.params.reactionId] } } } },
-            // { $pull: { reactions } },
+            { $pull: { reactions: req.params.reactionId } },
             { runValidators: true, new: true }
         )
             .then((thought) =>

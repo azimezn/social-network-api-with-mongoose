@@ -1,3 +1,4 @@
+// this is not a model, it is used as the reaction field's subdocument schema in the thought model
 const { Schema, Types } = require('mongoose');
 
 const reactionSchema = new Schema(
@@ -26,7 +27,5 @@ const reactionSchema = new Schema(
 
     }
 )
-
-// this is not a model, it is used as the reaction field's subdocument schema in the thought model
 
 module.exports = reactionSchema;

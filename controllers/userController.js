@@ -13,7 +13,6 @@ module.exports = {
     getSingleUser(req, res) {
         // get one user by its _id
         User.findOne({ _id: req.params.userId })
-            // ?????????? this means exclude _v from the returned document?
             .select('-_v')
             // populated thought and friend data ??????
             .populate('thoughts', 'friends')
@@ -92,7 +91,7 @@ module.exports = {
         User.findOneAndUpdate(
             { _id: req.params.userId },
             // $in ????????????
-            { $pull: { friends: { friendId: { $in: [req.params.friendId] } } } },
+            { $pull: { friends: req.params.friendId } },
             { runValidators: true, new: true }
         )
             .then((user) =>
