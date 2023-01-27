@@ -12,7 +12,6 @@ module.exports = {
     },
     getSingleUser(req, res) {
         // get one user by its _id
-        console.log(req.params.userId);
         User.findOne({ _id: req.params.userId })
             // ?????????? this means exclude _v from the returned document?
             .select('-_v')
@@ -20,7 +19,7 @@ module.exports = {
             .populate('thoughts', 'friends')
             .then((user) =>
                 !user
-                    ? res.status(404).json({ message: 'No user exists with this ID' })
+                    ? res.status(404).json({ message: 'No user exists with this ID!' })
                     : res.json(user)
             )
             .catch((err) => {
@@ -31,25 +30,31 @@ module.exports = {
     },
     createUser(req, res) {
         // create a new user
+        console.log("--- req.body", req.body)
         User.create(req.body)
             .then((dbUserData) => res.json(dbUserData))
             .catch((err) => res.status(500).json(err));
     },
     updateUser(req, res) {
-        // put to update user by its _id ????????
-        // $addToSet or $set
+        // update user by its _id
         User.findOneAndUpdate(
-            { _id: req.params.userId},
-            { $addToSet: req.body},
+            { _id: req.params.userId },
+            { $set: req.body },
             { runValidators: true, new: true }
         )
-    },
-    deleteUser(req, res) {
-        // delete to remove user by its _id ??????????
-        User.findOneAndRemove({ _id: req / params.userId })
             .then((user) =>
                 !user
-                    ? res.status(404).json({ message: 'No user exists with this ID' })
+                    ? res.status(404).json({ message: 'No user exists with this ID!' })
+                    : res.json(user)
+            )
+            .catch((err) => res.status(500).json(err));
+    },
+    deleteUser(req, res) {
+        // remove user by its _id
+        User.findOneAndRemove({ _id: req.params.userId })
+            .then((user) =>
+                !user
+                    ? res.status(404).json({ message: 'No user exists with this ID!' })
                     : Thought.findOneAndUpdate(
                         { users: req.params.userId },
                         { $pull: { students: req.params.userId } },
@@ -61,18 +66,40 @@ module.exports = {
                     ? res.status(404).json({
                         message: 'User deleted, but no thoughts found',
                     })
-                    : res.json({ message: 'User successfully deleted' })
+                    : res.json({ message: 'User and its thoughts successfully deleted' })
             )
             .catch((err) => {
                 console.log(err);
                 res.status(500).json(err);
             });
     },
-    // bonus. remove a user's associated thoughts when deleted ??????????
     addFriend(req, res) {
-        // post to add a new friend to a user's friend list ??????????
+        // add a new friend to a user's friend list
+        User.findOneAndUpdate(
+            { _id: req.params.userId },
+            { $addToSet: { friends: req.params.friendId } },
+            { runValidators: true, new: true }
+        )
+            .then((user) =>
+                !user
+                    ? res.status(404).json({ message: 'No user exists with this ID!' })
+                    : res.json(user)
+            )
+            .catch((err) => res.status(500).json(err));
     },
     removeFriend(req, res) {
-        // delete to remove a friend from a user's friend list ??????      
+        // remove a friend from a user's friend list ?????????????
+        User.findOneAndUpdate(
+            { _id: req.params.userId },
+            // $in ????????????
+            { $pull: { friends: { friendId: { $in: [req.params.friendId] } } } },
+            { runValidators: true, new: true }
+        )
+            .then((user) =>
+                !user
+                    ? res.status(404).json({ message: 'No user exists with this ID!' })
+                    : res.json(user)
+            )
+            .catch((err) => res.status(500).json(err));
     }
 }
