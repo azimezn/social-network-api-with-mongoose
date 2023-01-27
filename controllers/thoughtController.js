@@ -54,9 +54,32 @@ module.exports = {
             });
     },
     addReaction(req, res) {
-        // post to create a reaction stored in a single thought's reactions array field ????????
+        // create a reaction in a single thought
+        Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $addToSet: { reactions: req.body } },
+            { runValidators: true, new: true }
+        )
+            .then((thought) =>
+                !thought
+                    ? res.status(404).json({ message: 'No thought exists with this ID!' })
+                    : res.json(thought)
+            )
+            .catch((err) => res.status(500).json(err));
     },
-    removeRection(req, res) {
-        // delete to pull and remove a reaction by the reaction's reactionId value     
+    removeReaction(req, res) {
+        // delete to pull and remove a reaction by the reaction's reactionId value ????? added a route not on the readme...     
+        Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: { reactionId: { $in: [req.params.reactionId] } } } },
+            // { $pull: { reactions } },
+            { runValidators: true, new: true }
+        )
+            .then((thought) =>
+                !thought
+                    ? res.status(404).json({ message: 'No thought exists with this ID!' })
+                    : res.json(thought)
+            )
+            .catch((err) => res.status(500).json(err));
     }
 }
