@@ -4,7 +4,10 @@ module.exports = {
 
     getUsers(req, res) {
         // get all users
-        User.find()
+        User.find({})
+            .select('-_v')
+            .populate('friends')
+            .sort({ _id: -1 })
             // if successful, return users as a json response
             .then((users) => res.json(users))
             // if there is an error, return status code 500 (server error) and error message

@@ -52,16 +52,20 @@ module.exports = {
     deleteThought(req, res) {
         // remove thought by its _id
         Thought.findOneAndRemove({ _id: req.params.thoughtId })
-            .then((thought) => User.findOneAndUpdate(
-                { username: thought.username },
-                { $pull: { thoughts: thought._id } },
-                { new: true }
-            ))
-            .then((user) =>
-                user
-                    ? res.status(404).json({ message: 'No user exists with this username!' })
-                    : res.json(user)
-            )
+            .then((thought) => {
+                !thought
+                    ? res.status(404).json({ message: 'No thought exists with this ID!' })
+                    : User.findOneAndUpdate(
+                        { thoughts: req.params.thoughtId },
+                        { $pull: { thoughts: req.params.thoughtId } },
+                        { new: true }
+                    )
+                        .then((user) =>
+                            !user
+                                ? res.status(404).json({ message: 'No user exists with this username!' })
+                                : res.json(user)
+                        )
+            })
             .catch((err) => {
                 console.log(err);
                 res.status(500).json(err);
